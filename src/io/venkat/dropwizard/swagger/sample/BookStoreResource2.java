@@ -18,22 +18,8 @@ import javax.ws.rs.core.Response;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
-import com.fasterxml.jackson.databind.util.RawValue;
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
-import com.marklogic.client.document.JSONDocumentManager;
-import com.marklogic.client.io.JacksonHandle;
 
 import io.venkat.bookstore.dao.BookData;
-import io.venkat.bookstore.dao.BookStoreRepository;
-import io.venkat.bookstore.dao.MarkLogicBookStoreRepository;
 import io.venkat.bookstore.domain.Author;
 import io.venkat.bookstore.domain.Book;
 
@@ -42,18 +28,12 @@ import io.venkat.bookstore.domain.Book;
  * @author Venkat
  *
  */
-@Path("/bookstore")
-@Api("/bookstore")
+@Path("/bookstore2")
+@Api("/bookstore2")
 @Produces(MediaType.APPLICATION_JSON)
-public class BookStoreResource {
+public class BookStoreResource2 {
 
 	static BookData bookData = new BookData();
-	
-	private BookStoreRepository bookStoreRepository;
-	
-	public BookStoreResource(BookStoreRepository bookStoreRepository) {
-		this.bookStoreRepository = bookStoreRepository;
-	}
 
 	@GET
 	@ApiOperation("BookStore endpoint")
@@ -64,25 +44,23 @@ public class BookStoreResource {
 	@GET
 	@ApiOperation("BookStore endpoint for books /list ")
 	@Path("/list")
-	public List<String> getBookList() {
-		
-		return bookStoreRepository.findByTitle("");
+	public List<Book> getBookList() {
+		return BookData.getBooks();
 	}
 
 	@GET
 	@ApiOperation("BookStore endpoint for books /findByTitle")
 	@Path("/findByTitle")
-	public List<String> findByTitle(@QueryParam("title") String title) {
-
-		return bookStoreRepository.findByTitle(title);
+	public Book findByTitle(@QueryParam("title") String title) {
+		Book book1 = bookData.findBookByTitle(title);
+		return book1;
 	}
 
 	@DELETE
 	@ApiOperation("BookStore endpoint for books /deleteByTitle")
 	@Path("/deleteByTitle")
-	public Response deleteBook(@QueryParam("title") String isbn) {
-		bookStoreRepository.removeBook(isbn);
-		return Response.ok().entity("SUCCESS").build();
+	public boolean deleteBook(@QueryParam("title") String title) {
+		return bookData.removeBook(title);
 	}
 
 	@POST
@@ -95,8 +73,8 @@ public class BookStoreResource {
 			@FormParam("title") @ApiParam(defaultValue = "title") String title,
 			@FormParam("author") @ApiParam(defaultValue = "firstName,LastName") String author) {
 		Book book = new Book(isbn, price, edition, title, new Author(author, author));
-		bookStoreRepository.addBook(isbn, title);
-		return Response.ok().entity("SUCCESS").build();
+		bookData.addBook(book);
+		return Response.ok().entity(book).build();
 	}
 
 }
