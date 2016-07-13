@@ -1,14 +1,18 @@
 bookstore-rest-app
 =============================
 
-This application demonstrates REST API CRUD operations on BookStore developed using Dropwizard [REST Layer], MarkLogic [DB Layer] Swagger [API Documentation], (https://github.com/venkatwilliams/bookstore-rest) project
+This application demonstrates REST API CRUD operations on BookStore developed using Dropwizard [REST Layer], MarkLogic [DB Layer], Swagger [API Documentation], (https://github.com/venkatwilliams/bookstore-rest) project
 
-This application uses MarlLogic DB server running on host:127.0.0.1, port: 8000, database: bookstore, default user id passwords.
+This application uses default MarkLogic DB Server configurations with bookstore database.
 
 How to run it (from your IDE)
 ----------------------------
 
 Run the main method in the class BookStoreApplication.java using the following arguments: "server src/main/resources/bookstore-config.yaml"
+
+or 
+
+Eclipse (Dropwizard Plugin) -> Select "bookstore-rest" project -> Run As -> Dropwizard Application
 
 How to run it (command line)
 ----------------------------
