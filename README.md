@@ -1,4 +1,4 @@
-bookstore-rest-app
+bookstore-rest-api
 =============================
 
 This application demonstrates REST API CRUD operations on BookStore developed using Dropwizard [REST Layer], MarkLogic [DB Layer], Swagger [API Documentation], (https://github.com/venkatwilliams/bookstore-rest) project
