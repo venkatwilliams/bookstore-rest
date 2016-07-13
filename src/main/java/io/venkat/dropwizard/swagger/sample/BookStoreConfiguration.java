@@ -11,17 +11,5 @@ public class BookStoreConfiguration extends Configuration {
 
     @JsonProperty("swagger")
     public SwaggerBundleConfiguration swaggerBundleConfiguration;
-    
-    /*@Value("${marklogic.host}")
-    private String host;
-
-    @Value("${marklogic.port}")
-    private int port;
-
-    @Value("${marklogic.username}")
-    private String username;
-
-    @Value("${marklogic.password}")
-    private String password;*/
 
 }

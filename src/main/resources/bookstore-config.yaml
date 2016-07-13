@@ -6,10 +6,3 @@ server:
     port: 8888
 swagger:
   resourcePackage: io.venkat.dropwizard.swagger.sample
-  
-marklogic:
-  host: localhost
-  port: 8000
-  user: admin
-  password: admin
-  database: bookstore
