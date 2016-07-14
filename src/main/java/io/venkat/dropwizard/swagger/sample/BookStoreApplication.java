@@ -14,6 +14,7 @@ import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import io.venkat.bookstore.dao.BookStoreRepository;
 import io.venkat.bookstore.dao.MarkLogicBookStoreRepository;
+import io.venkat.bookstore.db.DBConfiguration;
 
 /**
  * @author Venkat
@@ -38,12 +39,13 @@ public class BookStoreApplication extends Application<BookStoreConfiguration> {
 
     @Override
     public void run(BookStoreConfiguration configuration, Environment environment) throws Exception {
-        // add your resources as usual
-    	DatabaseClient client = DatabaseClientFactory.newClient("localhost", 8000,"bookstore", "admin", "admin",
-				Authentication.DIGEST);    	
+        //DB Client preparation
+    	DatabaseClient client = DBConfiguration.getMarkLogicClient();  	
     	BookStoreRepository bookStoreRepository = new MarkLogicBookStoreRepository(client.newXMLDocumentManager(), client.newQueryManager());
     	
+    	//resource registration
         environment.jersey().register(new BookStoreResource(bookStoreRepository));
+        //configuration
         BeanConfig config = new BeanConfig();
         config.setTitle("Swagger BookStore  REST API");
         config.setVersion("1.0.0");

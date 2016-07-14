@@ -1,7 +1,5 @@
 package io.venkat.dropwizard.swagger.sample;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -10,6 +8,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -18,24 +17,11 @@ import javax.ws.rs.core.Response;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
-import com.fasterxml.jackson.databind.util.RawValue;
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
-import com.marklogic.client.document.JSONDocumentManager;
-import com.marklogic.client.io.JacksonHandle;
 
-import io.venkat.bookstore.dao.BookData;
 import io.venkat.bookstore.dao.BookStoreRepository;
-import io.venkat.bookstore.dao.MarkLogicBookStoreRepository;
 import io.venkat.bookstore.domain.Author;
 import io.venkat.bookstore.domain.Book;
+import io.venkat.bookstore.domain.BookStoreResponse;
 
 /**
  * 
@@ -46,8 +32,6 @@ import io.venkat.bookstore.domain.Book;
 @Api("/bookstore")
 @Produces(MediaType.APPLICATION_JSON)
 public class BookStoreResource {
-
-	static BookData bookData = new BookData();
 	
 	private BookStoreRepository bookStoreRepository;
 	
@@ -64,38 +48,59 @@ public class BookStoreResource {
 	@GET
 	@ApiOperation("BookStore endpoint for books /list ")
 	@Path("/list")
-	public List<String> getBookList() {
+	public BookStoreResponse getBookList() {
 		
-		return bookStoreRepository.findByTitle("");
+		BookStoreResponse response = new BookStoreResponse();
+		response.setBooks(bookStoreRepository.findByTitle(""));
+		
+		return response;
 	}
 
 	@GET
-	@ApiOperation("BookStore endpoint for books /findByTitle")
-	@Path("/findByTitle")
-	public List<String> findByTitle(@QueryParam("title") String title) {
+	@ApiOperation("BookStore endpoint for books /search/{searchKey}")
+	@Path("/search/{searchKey}")
+	public BookStoreResponse findBookBySearchKey(@PathParam("searchKey") String searchKey) {
+		
+		BookStoreResponse response = new BookStoreResponse();
+		response.setBooks(bookStoreRepository.findByTitle(searchKey));
 
-		return bookStoreRepository.findByTitle(title);
+		return response;
+	}
+	
+	@GET
+	@ApiOperation("BookStore endpoint for books /{isbn}")
+	@Path("/{isbn}")
+	public String findBookByIsbn(@PathParam("isbn") String isbn) {
+
+		return bookStoreRepository.getBook(isbn);
 	}
 
 	@DELETE
 	@ApiOperation("BookStore endpoint for books /deleteByTitle")
-	@Path("/deleteByTitle")
-	public Response deleteBook(@QueryParam("title") String isbn) {
+	@Path("/deleteByIsbn")
+	public Response deleteBook(@QueryParam("isbn") String isbn) {
 		bookStoreRepository.removeBook(isbn);
 		return Response.ok().entity("SUCCESS").build();
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@ApiOperation(value = "Add a Book", notes = "Adding a new book and get book details", response = Book.class)
+	@ApiOperation(value = "BookStore endpoint for Add a Book", notes = "Adding a new book and get book details", response = Book.class)
 	@Path("/add")
 	public Response addBook(@FormParam("isbn") @ApiParam(defaultValue = "isbn") String isbn,
 			@FormParam("price") @ApiParam(defaultValue = "price") double price,
 			@FormParam("edition") @ApiParam(defaultValue = "edition") double edition,
 			@FormParam("title") @ApiParam(defaultValue = "title") String title,
 			@FormParam("author") @ApiParam(defaultValue = "firstName,LastName") String author) {
-		Book book = new Book(isbn, price, edition, title, new Author(author, author));
-		bookStoreRepository.addBook(isbn, title);
+		
+		Author authors = new Author();
+		if (!author.isEmpty() && author != null && author.contains(",")){
+			String[] names = author.split(",");
+			authors.setFirstName(names[0]);
+			authors.setLastName(names[1]);
+		}
+		Book book = new Book(isbn, price, edition, title, authors);
+		bookStoreRepository.addBook(isbn, book);
 		return Response.ok().entity("SUCCESS").build();
 	}
 

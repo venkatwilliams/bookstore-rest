@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.document.JSONDocumentManager;
 import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.JacksonHandle;
@@ -12,6 +13,8 @@ import com.marklogic.client.io.StringHandle;
 import com.marklogic.client.query.MatchDocumentSummary;
 import com.marklogic.client.query.QueryManager;
 import com.marklogic.client.query.StringQueryDefinition;
+
+import io.venkat.bookstore.domain.Book;
 
 /**
  * 
@@ -28,19 +31,13 @@ public class MarkLogicBookStoreRepository implements BookStoreRepository{
         this.documentManager = documentManager;
         this.queryManager = queryManager;
     }
-    
-	@Override
-	public void addBook(String isbn, String title) {
-		StringHandle handle = new StringHandle(title);
-        documentManager.write(isbn, handle);
-		
-	}
 
 	@Override
 	public String getBook(String isbn) {
-		StringHandle handle = new StringHandle();
+		JacksonHandle handle = new JacksonHandle();
         documentManager.read(isbn, handle);
-        return handle.get();
+        JsonNode node = handle.get();
+        return node.toString();
 	}
 
 	@Override
@@ -62,16 +59,26 @@ public class MarkLogicBookStoreRepository implements BookStoreRepository{
         return getResultListFor(resultsHandle);
 	}
 	
+	@Override
+	public void addBook(String id, Book book) {
+		ObjectMapper mapper = new ObjectMapper(); 
+		JsonNode node = mapper.convertValue(book, JsonNode.class);
+		JacksonHandle handle = new JacksonHandle(node);
+        documentManager.write(id, handle);		
+	}
+	
 	private List<String> getResultListFor(SearchHandle resultsHandle) {
         List<String> result = new ArrayList<String>();
         for (MatchDocumentSummary summary : resultsHandle.getMatchResults()) {
         	//JacksonHandle content = new JacksonHandle();
-        	StringHandle content = new StringHandle();
+        	//StringHandle content = new StringHandle();
+        	JacksonHandle content = new JacksonHandle();
             documentManager.read(summary.getUri(), content);
+            JsonNode node = content.get();
             //JsonNode doc = content.get();
-            result.add(content.get());
+            result.add(node.toString());
         }
         return result;
-    }
+    }	
 
 }
