@@ -76,7 +76,7 @@ public class BookStoreResource {
 	}
 
 	@DELETE
-	@ApiOperation("BookStore endpoint for books /deleteByTitle")
+	@ApiOperation("BookStore endpoint for books /deleteByIsbn")
 	@Path("/deleteByIsbn")
 	public Response deleteBook(@QueryParam("isbn") String isbn) {
 		bookStoreRepository.removeBook(isbn);

@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,8 @@ public class MarkLogicBookStoreRepositoryIntegrationTest {
     private static final String SAMPLE_BOOK = "DataMining";
     private static Book book = new Book("001",1500.0,1.0,"Computer Networks", new Author("Venkat", "Rao"));
     
-	private BookStoreRepository bookStoreRepository;
+    @Mock
+	BookStoreRepository bookStoreRepository;
 	
 	@Before
     public void setUp() {
@@ -46,14 +48,12 @@ public class MarkLogicBookStoreRepositoryIntegrationTest {
         JsonNode node = mapper.convertValue(book, JsonNode.class);
         JacksonHandle handle = new JacksonHandle(node);
         JsonNode node2 = handle.get();
-        System.out.println("MarkLogicBookStoreRepositoryIntegrationTest before saving"+ node2.toString());
-        
+                
         // then
         bookStoreRepository.addBook(isbn, book);
         // when
         String result = bookStoreRepository.getBook(isbn);
-        System.out.println("MarkLogicBookStoreRepositoryIntegrationTest After saving"+ result);
-        
+                
         assertThat(node2.toString(), is(result));
     }
 
