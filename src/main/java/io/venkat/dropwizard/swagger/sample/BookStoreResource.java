@@ -1,7 +1,5 @@
 package io.venkat.dropwizard.swagger.sample;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -10,7 +8,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -46,8 +43,8 @@ public class BookStoreResource {
 	}
 
 	@GET
-	@ApiOperation("BookStore endpoint for books /list ")
-	@Path("/list")
+	@ApiOperation("BookStore endpoint for books /books ")
+	@Path("/books")
 	public BookStoreResponse getBookList() {
 		
 		BookStoreResponse response = new BookStoreResponse();
@@ -57,8 +54,8 @@ public class BookStoreResource {
 	}
 
 	@GET
-	@ApiOperation("BookStore endpoint for books /search/{searchKey}")
-	@Path("/search/{searchKey}")
+	@ApiOperation("BookStore endpoint for books /books/{searchKey}")
+	@Path("/books/{searchKey}")
 	public BookStoreResponse findBookBySearchKey(@PathParam("searchKey") String searchKey) {
 		
 		BookStoreResponse response = new BookStoreResponse();
@@ -76,9 +73,9 @@ public class BookStoreResource {
 	}
 
 	@DELETE
-	@ApiOperation("BookStore endpoint for books /deleteByIsbn")
-	@Path("/deleteByIsbn")
-	public Response deleteBook(@QueryParam("isbn") String isbn) {
+	@ApiOperation("BookStore endpoint for books /books/{isbn}")
+	@Path("/books/{isbn}")
+	public Response deleteBook(@PathParam("isbn") String isbn) {
 		bookStoreRepository.removeBook(isbn);
 		return Response.ok().entity("SUCCESS").build();
 	}
@@ -86,7 +83,7 @@ public class BookStoreResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@ApiOperation(value = "BookStore endpoint for Add a Book", notes = "Adding a new book and get book details", response = Book.class)
-	@Path("/add")
+	@Path("/books")
 	public Response addBook(@FormParam("isbn") @ApiParam(defaultValue = "isbn") String isbn,
 			@FormParam("price") @ApiParam(defaultValue = "price") double price,
 			@FormParam("edition") @ApiParam(defaultValue = "edition") double edition,

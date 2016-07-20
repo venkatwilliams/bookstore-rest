@@ -23,7 +23,7 @@ import io.venkat.bookstore.domain.Book;
  */
 public class MarkLogicBookStoreRepository implements BookStoreRepository{
 	
-	private XMLDocumentManager documentManager;
+	private XMLDocumentManager documentManager
     private QueryManager queryManager;
     private static final int PAGE_SIZE = 5;
 
